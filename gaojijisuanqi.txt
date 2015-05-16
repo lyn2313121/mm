@@ -1,0 +1,163 @@
+package 高级计算器;
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+public class Calculater extends JFrame implements ActionListener{
+JTextField x; //文本框
+String preOperater=""; //上一次的运算符
+double sum=0; //运算结果
+public Calculater(String title){
+super(title);
+Container c=getContentPane(); //容器
+c.setLayout(new BorderLayout()); //容器采用边缘布局
+x=new JTextField(50);
+c.add("North",x); 
+String buttoned[]={"0","1","2","3","+/-",".","C","退格","求倒","4","5","6","7","+","-","*","/","%","8","9","=","sqrt","pow","log","cos","tan","exp"};
+JPanel p=new JPanel(); //面板
+p.setLayout(new GridLayout(3,9,10,10));  //面板采用行列数3，6的网格布局
+for(int k=0;k<buttoned.length;k++) { //用一个for循环将按钮添加进面板并注册监听器
+JButton b=new JButton(buttoned[k]);
+p.add(b);
+b.addActionListener(this);
+}
+c.add("Center",p);
+this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+}
+
+//响应用户事件，根据点击按钮实现相关操作
+public void actionPerformed(ActionEvent e){
+	String Command=e.getActionCommand();
+	try{
+		if(Character.isDigit(Command.charAt(0))){ //如果按钮事件为数字键
+			x.setText(x.getText()+Command); //添加数字
+		}
+		else if(Command.equals(".")){ //如果按钮事件为"."键
+			xiaoshu();
+		}
+		else if(Command.equals("+/-")) { //如果按钮事件为"+/-"键
+			fuhao();
+		}
+		else if (Command.equals("退格")){ //如果按钮事件为"退格"键
+			backspace();
+		}
+		else if(Command.equals("=")){  //如果按钮事件为"="键
+				dengyu();
+		}
+		else if(Command.equals("sqrt")){ //如果按钮事件为"sqrt"键
+				sqrt();
+		}
+		else if(Command.equals("log")){  //如果按钮事件为"log"键
+				log();
+		}
+		else if(Command.equals("cos")){ //如果按钮事件为"cos"键
+				cos();
+		}
+		else if(Command.equals("tan")){  //如果按钮事件为"tan"键
+				tan();
+		}
+		else if(Command.equals("exp")){ //如果按钮事件为"exp"键
+				exp();
+		}
+		else if (Command.equals("求倒")) {  //如果按钮事件为"求倒"键		
+				qiudao();
+		}
+		else if(Command.equals("C")){  //如果按钮事件为"C"键
+				clear();
+		}
+		else {	doOperation();  //记录运算符和输入的数字
+				x.setText("");
+				preOperater=Command;
+		}
+	}catch(Exception ex) {sum=0; x.setText("");}
+}
+
+void xiaoshu(){  //添加小数点
+	String s=x.getText();
+	if(s.indexOf(".")==-1) 
+		x.setText(s+".");
+}
+
+void fuhao(){  //添加负号
+	String s=x.getText();
+	if(s.indexOf("-")==-1) 
+		x.setText("-"+x.getText()); 
+}
+
+void backspace(){  //退格
+	String s=x.getText(); 
+	if(s.length()>0) 
+		x.setText(s.substring(0,s.length()-1)); //删除最后一个字符
+}
+
+void dengyu(){  //等号，显示计算结果
+	doOperation();
+	x.setText(""+sum);
+	preOperater="";
+}
+
+void sqrt(){  //求该数的平方根
+	double m=Double.parseDouble(x.getText());
+	if (m<0) 
+		x.setText("负数不能开根号");	
+	else
+	x.setText(""+Math.sqrt(m));
+}
+
+void log(){  //求该数的自然对数
+double m=Double.parseDouble(x.getText());
+	if (m<0) 
+		x.setText("负数不能进行自然对数运算");
+	else
+	x.setText(""+Math.log(m));
+}
+
+void cos(){  //求该数的余弦
+	double m=Double.parseDouble(x.getText());
+	x.setText(""+Math.cos(m));
+}
+
+void tan(){  //求该数的正切
+	double m=Double.parseDouble(x.getText());
+	x.setText(""+Math.tan(m));
+}
+
+void exp(){  //求e的幂
+	double m=Double.parseDouble(x.getText());
+	x.setText(""+Math.exp(m));
+}
+
+void qiudao(){  //求倒
+	if (Double.parseDouble(x.getText())==0) 
+		x.setText("除数不能为零");	
+	else{
+		x.setText(""+1/(Double.parseDouble(x.getText())));
+		preOperater="";
+	}		
+}
+
+void clear(){  //清零
+	sum=0;
+	x.setText("");
+	preOperater="";
+}
+
+//根据记录的运算符将前面记录的结果sum与文本框中的数据进行运算
+void doOperation(){
+	double m=Double.parseDouble(x.getText());
+	if(preOperater.equals("")) sum=m;
+	//将结果与文本框中的数据按照前一个运算符运算
+	if(preOperater.equals("+")) sum=sum+m;  //加法运算
+	if(preOperater.equals("-")) sum=sum-m;  //减法运算
+	if(preOperater.equals("*")) sum=sum*m;  //乘法运算
+	if(preOperater.equals("/")) sum=sum/m;  //除法运算
+	if(preOperater.equals("%")) sum=sum%m;  //求余
+	if(preOperater.equals("pow")) sum=Math.pow(sum, m); //求幂
+}
+
+public static void main(String a[]){
+JFrame x=new Calculater("计算器");
+x.setSize(650,300);
+x.setVisible(true);
+}
+}
